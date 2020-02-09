@@ -1,44 +1,26 @@
 const express = require("express");
-const students = require("./students");
 const bodyParser = require("body-parser");
+const studentsRouter = require("./Router/studentsRouter");
+const studentRouter = require("./Router/studentRouter");
 
 const app = express();
 
-// app.use((request, respond, next) => {
-//   respond.send("from middleware");
-//   request.customKey("value in middleware");
+app.use(bodyParser.json());
+
+// app.use((req, res, next) => {
+//   // res.send("Response from Middleware");
+//   req.customKey = "Value set in the middleware";
 //   next();
 // });
 
-app.use(bodyParser.json());
-
-app.get("/", (request, respond) => {
-  respond.send("<h1>Hello</h1>");
+app.get("/", (req, res) => {
+  res.send("Hello");
 });
 
-app.get("/students", (request, respond) => {
-  respond.status(200).json({ students});
-  respond.send(students);
-});
+app.use("/students", studentsRouter);
 
-app.post("/students", (request, respond) => {
-  if (request.body.id && request.body.FirstName) {
-    students.push(request.body);
-    respond.status(200).json({ message: "student updated" });
-  } else {
-    respond.status(400).send("Bad Request");
-  }
-});
-
-app.get("/student/:id", (request, respond) => {
-  const { id = "" } = request.params;
-  const reqStudent = students.find(student => {
-    if (parseInt(id) === student.id) return true;
-    else return false;
-  });
-  respond.status(200).json({ student: reqStudent });
-});
+app.use("/student", studentRouter);
 
 const server = app.listen(8080, () => {
-  console.log(`Server running in port ${server.address().port}.`);
+  console.log(`Server running in port ${server.address().port}`);
 });
