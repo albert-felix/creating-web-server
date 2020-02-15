@@ -29,6 +29,7 @@ studentRouter
     const { id } = req.params;
 
     let requiredStudentIndex;
+
     const requiredStudent = students.find((student, studentIndex) => {
       if (parseInt(id) === student.id) {
         requiredStudentIndex = studentIndex;
