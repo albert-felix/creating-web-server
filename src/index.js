@@ -4,13 +4,18 @@ const expressHbs = require("express-handlebars");
 const path =  require("path");
 const studentsRouter = require("./Router/studentsRouter");
 const studentRouter = require("./Router/studentRouter");
+const students = require("./students")
+const formatIndex = require("./views/helper/formatIndex")
 
 const app = express();
 
 const hbs = expressHbs.create({
   extname : ".hbs",
   layoutsDir : path.join(__dirname,"./views/layouts"),
-  partialsDir : path.join(__dirname,"./views/partials")
+  partialsDir : path.join(__dirname,"./views/partials"),
+  helpers: {
+    formatIndex
+  }
 });
 
 app.engine(".hbs",hbs.engine);
@@ -27,8 +32,17 @@ app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
   res.render("home",{
-    layout: "hero"
+    layout: "hero",
+    pageTitle: "Home"
   });
+});
+
+app.get("/web/students",(req,res) => {
+  res.render("students",{
+    layout : "navigation",
+    pageTitle: "Students",
+    students
+  })
 });
 
 app.use("/students", studentsRouter);
