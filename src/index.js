@@ -23,6 +23,7 @@ app.set("view engine",".hbs");
 app.set("views",path.join(__dirname,"./views"));
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended : true}));
 
 // app.use((req, res, next) => {
 //   // res.send("Response from Middleware");
@@ -42,6 +43,13 @@ app.get("/web/students",(req,res) => {
     layout : "navigation",
     pageTitle: "Students",
     students
+  })
+});
+
+app.get("/web/add-student",(req,res) => {
+  res.render("addStudent",{
+    layout: "navigation",
+    pageTitle : "Add New Student"
   })
 });
 
