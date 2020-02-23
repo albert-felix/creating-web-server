@@ -6,6 +6,7 @@ const studentsRouter = require("./Router/studentsRouter");
 const studentRouter = require("./Router/studentRouter");
 const students = require("./students")
 const formatIndex = require("./views/helper/formatIndex")
+const ifEquality = require("./views/helper/ifEquality")
 
 const app = express();
 
@@ -14,7 +15,8 @@ const hbs = expressHbs.create({
   layoutsDir : path.join(__dirname,"./views/layouts"),
   partialsDir : path.join(__dirname,"./views/partials"),
   helpers: {
-    formatIndex
+    formatIndex,
+    ifEquality
   }
 });
 
@@ -49,8 +51,28 @@ app.get("/web/students",(req,res) => {
 app.get("/web/add-student",(req,res) => {
   res.render("addStudent",{
     layout: "navigation",
-    pageTitle : "Add New Student"
+    pageTitle : "Add New Student",
+    studentID : students.length+1
   })
+});
+
+app.get("/web/edit-student/:id", (req, res) => {
+  const { id = "" } = req.params;
+  const requiredStudent = students.find(student => {
+    if (parseInt(id) === student.id) return true;
+    else return false;
+  });
+  if (requiredStudent) {
+    res.render("addStudent", {
+      layout: "navigation",
+      pageTitle: "Add New Student",
+      studentID: requiredStudent.id,
+      mode: "edit",
+      student: requiredStudent
+    });
+  } else {
+    res.status(404).send("Not Found");
+  }
 });
 
 app.use("/students", studentsRouter);

@@ -1,17 +1,69 @@
-<form action="/student" method="POST">
+<form action="/student" id="add-student-form" method="POST" target="blank">
+  <input type="hidden" name="id" value="{{studentID}}" />
   <label for="fname">First Name</label>
-  <input type="text" id="fname" name="firstName" placeholder="First Name" required />
+  <input type="text" id="fname" name="firstName" placeholder="First Name" value="{{student.firstName}}" required />
   <br />
   <label for="lname">Last Name</label>
-  <input type="text" id="lname" name="lastName" placeholder="Last Name" required />
+  <input type="text" id="lname" name="lastName" placeholder="Last Name" value="{{student.lastName}}" required />
   <br />
   <label for="age">Age</label>
-  <input type="text" id="age" name="age" placeholder="Age" required />
+  <input type="text" id="age" name="age" placeholder="Age" value="{{student.age}}" required />
   <br />
   <label for="gender">Gender:</label>
-  <input type="radio" name="gender" id="gender" value="male" required />
-  <label for="male">Male</label>
-  <input type="radio" name="gender" id="gender" value="female" required />
-  <label for="female">Female</label>
-  <input type="submit" value="Add Student">
+  <input type="radio" id="gender-male" name="gender" value="male"
+    checked="{{#if (ifEquality student.gender "male")}}true{{/if}}" required />
+  <label for="gender-male">Male</label>
+  <input type="radio" id="gender-female" name="gender" value="female"
+    {{#if (ifEquality student.gender "female")}}true{{/if}} required />
+  <label for="gender-female">Female</label><br />
+  <input type="submit" value="{{#if (ifEquality mode "edit")}}Save{{else}}Add Student{{/if}}" />
 </form>
+<script>
+  const $addStudentForm = document.querySelector("#add-student-form");
+  $addStudentForm.addEventListener("submit", (event) => {
+    let formDetailsJson = {};
+    event.preventDefault();
+    const studentFormDetails = new FormData($addStudentForm);
+    for (const details of studentFormDetails.entries()) {
+      const [key, value] = details;
+      formDetailsJson[key] = value;
+    }
+
+    let url, config;
+    if ("{{mode}}" === "edit") {
+      url = "/student/{{studentID}}";
+      config = {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formDetailsJson)
+      }else {
+        url = "/student";
+        config = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formDetailsJson)
+        }
+      };
+
+      fetch(url, config)
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            throw Error("Request Failed");
+          }
+        })
+        .then(data => {
+          alert(data.message);
+        })
+        .catch(() => {
+          alert("Something went wrong!");
+        });
+
+
+    });
+</script>
